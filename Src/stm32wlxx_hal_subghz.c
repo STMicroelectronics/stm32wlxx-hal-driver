@@ -1241,7 +1241,8 @@ void HAL_SUBGHZ_IRQHandler(SUBGHZ_HandleTypeDef *hsubghz)
   }
 
   /* Packet received Interrupt */
-  if (SUBGHZ_CHECK_IT_SOURCE(itsource, SUBGHZ_IT_RX_CPLT) != RESET)
+  if ((SUBGHZ_CHECK_IT_SOURCE(itsource, SUBGHZ_IT_RX_CPLT) != RESET) && \
+      (SUBGHZ_CHECK_IT_SOURCE(itsource, SUBGHZ_IT_CRC_ERROR) == RESET))
   {
 #if (USE_HAL_SUBGHZ_REGISTER_CALLBACKS == 1U)
     hsubghz->RxCpltCallback(hsubghz);
