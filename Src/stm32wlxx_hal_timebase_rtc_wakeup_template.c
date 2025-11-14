@@ -1,9 +1,9 @@
 /**
   ******************************************************************************
-  * @file    stm32wlxx_hal_timebase_rtc_wakeup_template.c 
+  * @file    stm32wlxx_hal_timebase_rtc_wakeup_template.c
   * @author  MCD Application Team
   * @brief   HAL time base based on the hardware RTC_WAKEUP Template.
-  *    
+  *
   *          This file overrides the native HAL time base functions (defined as weak)
   *          to use the RTC WAKEUP for the time base generation:
   *           + Initializes the RTC peripheral and configures the wakeup timer to be
@@ -19,9 +19,9 @@
     This file must be copied to the application folder and modified as follows:
     (#) Rename it to 'stm32wlxx_hal_timebase_rtc_wakeup.c'
     (#) Add this file and the RTC HAL drivers to your project and uncomment
-       HAL_RTC_MODULE_ENABLED define in stm32wlxx_hal_conf.h 
+       HAL_RTC_MODULE_ENABLED define in stm32wlxx_hal_conf.h
 
-  @endverbatim 
+  @endverbatim
   ******************************************************************************
   * @attention
   *
@@ -48,7 +48,7 @@
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 
-/* Uncomment the line below to select the appropriate RTC Clock source for your application: 
+/* Uncomment the line below to select the appropriate RTC Clock source for your application:
   + RTC_CLOCK_SOURCE_HSE: can be selected for applications requiring timing precision.
   + RTC_CLOCK_SOURCE_LSE: can be selected for applications with low constraint on timing
                           precision.
@@ -92,15 +92,15 @@ void RTC_WKUP_IRQHandler(void);
 /* Private functions ---------------------------------------------------------*/
 
 /**
-  * @brief  This function configures the RTC_WKUP as a time base source. 
-  *         The time source is configured  to have 1ms time base with a dedicated 
-  *         Tick interrupt priority. 
-  *         Wakeup Time base = ((RTC_ASYNCH_PREDIV + 1) * (RTC_SYNCH_PREDIV + 1)) / RTC_CLOCK 
+  * @brief  This function configures the RTC_WKUP as a time base source.
+  *         The time source is configured  to have 1ms time base with a dedicated
+  *         Tick interrupt priority.
+  *         Wakeup Time base = ((RTC_ASYNCH_PREDIV + 1) * (RTC_SYNCH_PREDIV + 1)) / RTC_CLOCK
                              = 1ms
-  *         Wakeup Time = WakeupTimebase * WakeUpCounter (0 + 1) 
+  *         Wakeup Time = WakeupTimebase * WakeUpCounter (0 + 1)
                         = 1 ms
   * @note   This function is called  automatically at the beginning of program after
-  *         reset by HAL_Init() or at any time when clock is configured, by HAL_RCC_ClockConfig(). 
+  *         reset by HAL_Init() or at any time when clock is configured, by HAL_RCC_ClockConfig().
   * @param  TickPriority: Tick interrupt priority.
   * @retval HAL status
   */
@@ -122,9 +122,9 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 
     /* Disable the Wake-up Timer */
     __HAL_RTC_WAKEUPTIMER_DISABLE(&hRTC_Handle);
-    /* In case of interrupt mode is used, the interrupt source must disabled */ 
-    __HAL_RTC_WAKEUPTIMER_DISABLE_IT(&hRTC_Handle,RTC_IT_WUT);
-    __HAL_RTC_WAKEUPTIMER_CLEAR_FLAG(&hRTC_Handle,RTC_FLAG_WUTF);
+    /* In case of interrupt mode is used, the interrupt source must disabled */
+    __HAL_RTC_WAKEUPTIMER_DISABLE_IT(&hRTC_Handle, RTC_IT_WUT);
+    __HAL_RTC_WAKEUPTIMER_CLEAR_FLAG(&hRTC_Handle, RTC_FLAG_WUTF);
 
     /* Get RTC clock configuration */
     HAL_RCCEx_GetPeriphCLKConfig(&PeriphClkInitStruct);
@@ -135,7 +135,8 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 #elif defined (RTC_CLOCK_SOURCE_LSI)
     if ((PeriphClkInitStruct.RTCClockSelection == RCC_RTCCLKSOURCE_LSI) && (__HAL_RCC_GET_FLAG(RCC_FLAG_LSIRDY) != 0x00u))
 #elif defined (RTC_CLOCK_SOURCE_HSE)
-    if ((PeriphClkInitStruct.RTCClockSelection == RCC_RTCCLKSOURCE_HSE_DIV32) && (__HAL_RCC_GET_FLAG(RCC_FLAG_HSERDY) != 0x00u))
+    if ((PeriphClkInitStruct.RTCClockSelection == RCC_RTCCLKSOURCE_HSE_DIV32)
+        && (__HAL_RCC_GET_FLAG(RCC_FLAG_HSERDY) != 0x00u))
 #else
 #error Please select the RTC Clock source
 #endif
@@ -167,14 +168,14 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 
       /* COnfigure oscillator */
       status = HAL_RCC_OscConfig(&RCC_OscInitStruct);
-      if(status == HAL_OK)
+      if (status == HAL_OK)
       {
         /* Configure RTC clock source */
         PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
         status = HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
 
         /* Enable RTC Clock */
-        if(status == HAL_OK)
+        if (status == HAL_OK)
         {
           __HAL_RCC_RTC_ENABLE();
         }
@@ -182,7 +183,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
     }
 
     /* If RTC Clock configuration is ok */
-    if(status == HAL_OK)
+    if (status == HAL_OK)
     {
       /* No care of RTC init parameter here. Only needed if RTC is being used
         for other features in same time: calendar, alarm, timestamp, etc... */
@@ -195,7 +196,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
       hRTC_Handle.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
       status = HAL_RTC_Init(&hRTC_Handle);
 
-      if(status == HAL_OK)
+      if (status == HAL_OK)
       {
         /* The time base should be of (uint32_t)uwTickFreq) ms. Tick counter
           is incremented eachtime wakeup time reaches zero. Wakeup timer is
@@ -209,10 +210,10 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
         /* HSE input clock to RTC is divided by 32 */
         wucounter = (HSE_VALUE >> 5);
 #endif
-        wucounter = ((wucounter >> 1) / (1000U / (uint32_t)uwTickFreq)) -1u;
+        wucounter = ((wucounter >> 1) / (1000U / (uint32_t)uwTickFreq)) - 1u;
         status = HAL_RTCEx_SetWakeUpTimer_IT(&hRTC_Handle, wucounter, RTC_WAKEUPCLOCK_RTCCLK_DIV2, 0);
 
-        if(status == HAL_OK)
+        if (status == HAL_OK)
         {
           /* Enable the RTC global Interrupt */
 #if defined(CORE_CM0PLUS)

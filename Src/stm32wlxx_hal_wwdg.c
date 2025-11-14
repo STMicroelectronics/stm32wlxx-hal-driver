@@ -421,3 +421,4 @@ __weak void HAL_WWDG_EarlyWakeupCallback(WWDG_HandleTypeDef *hwwdg)
   */
 
 #endif /* CORE_CM0PLUS */
+

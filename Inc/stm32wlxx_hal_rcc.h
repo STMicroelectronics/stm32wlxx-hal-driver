@@ -633,11 +633,11 @@ typedef struct
   */
 
 /* @cond */
-  /* 32     28      20       16      0
-   --------------------------------
-   | MCO   | GPIO  | GPIO  | GPIO  |
-   | Index |  AF   | Port  |  Pin  |
-   -------------------------------*/
+/* 32     28      20       16      0
+ --------------------------------
+ | MCO   | GPIO  | GPIO  | GPIO  |
+ | Index |  AF   | Port  |  Pin  |
+ -------------------------------*/
 
 #define RCC_MCO_GPIOPORT_POS   16U
 #define RCC_MCO_GPIOPORT_MASK  (0xFUL << RCC_MCO_GPIOPORT_POS)
