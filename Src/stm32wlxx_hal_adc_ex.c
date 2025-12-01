@@ -214,6 +214,8 @@ HAL_StatusTypeDef HAL_ADCEx_Calibration_Start(ADC_HandleTypeDef *hadc)
           /* Set ADC error code to ADC peripheral internal error */
           SET_BIT(hadc->ErrorCode, HAL_ADC_ERROR_INTERNAL);
 
+          __HAL_UNLOCK(hadc);
+
           return HAL_ERROR;
         }
       }
