@@ -1,6 +1,6 @@
 # STM32CubeWL HAL Driver MCU Component
 
-![latest tag](https://img.shields.io/github/v/tag/STMicroelectronics/stm32wlxx_hal_driver.svg?color=brightgreen)
+![tag](https://img.shields.io/badge/tag-v1.5.0-brightgreen.svg)
 
 ## Overview
 
@@ -23,7 +23,7 @@ This **stm32wlxx_hal_driver** MCU component repo is one element of the STM32Cube
 
 ## Release note
 
-Details about the content of this release are available in the release note [here](https://htmlpreview.github.io/?https://github.com/STMicroelectronics/stm32wlxx_hal_driver/blob/master/Release_Notes.html).
+Details about the content of this release are available in the release note [here](https://htmlpreview.github.io/?https://github.com/STMicroelectronics/stm32wlxx_hal_driver/blob/main/Release_Notes.html).
 
 
 ## Compatibility information
