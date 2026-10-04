@@ -1244,20 +1244,6 @@ void HAL_SUBGHZ_IRQHandler(SUBGHZ_HandleTypeDef *hsubghz)
 #endif /* USE_HAL_SUBGHZ_REGISTER_CALLBACKS */
   }
 
-  /* Packet received Interrupt */
-  if ((SUBGHZ_CHECK_IT_SOURCE(itsource, SUBGHZ_IT_RX_CPLT) != RESET))
-  {
-    if (SUBGHZ_CHECK_IT_SOURCE(itsource, SUBGHZ_IT_CRC_ERROR) != RESET)
-    {
-      hsubghz->ErrorCode |= HAL_SUBGHZ_ERROR_CRC_MISMATCH;
-    }
-#if (USE_HAL_SUBGHZ_REGISTER_CALLBACKS == 1U)
-    hsubghz->RxCpltCallback(hsubghz);
-#else
-    HAL_SUBGHZ_RxCpltCallback(hsubghz);
-#endif /* USE_HAL_SUBGHZ_REGISTER_CALLBACKS */
-  }
-
   /* Preamble Detected Interrupt */
   if (SUBGHZ_CHECK_IT_SOURCE(itsource, SUBGHZ_IT_PREAMBLE_DETECTED) != RESET)
   {
@@ -1295,6 +1281,20 @@ void HAL_SUBGHZ_IRQHandler(SUBGHZ_HandleTypeDef *hsubghz)
     hsubghz->HeaderErrorCallback(hsubghz);
 #else
     HAL_SUBGHZ_HeaderErrorCallback(hsubghz);
+#endif /* USE_HAL_SUBGHZ_REGISTER_CALLBACKS */
+  }
+
+  /* Packet received Interrupt */
+  if ((SUBGHZ_CHECK_IT_SOURCE(itsource, SUBGHZ_IT_RX_CPLT) != RESET))
+  {
+    if (SUBGHZ_CHECK_IT_SOURCE(itsource, SUBGHZ_IT_CRC_ERROR) != RESET)
+    {
+      hsubghz->ErrorCode |= HAL_SUBGHZ_ERROR_CRC_MISMATCH;
+    }
+#if (USE_HAL_SUBGHZ_REGISTER_CALLBACKS == 1U)
+    hsubghz->RxCpltCallback(hsubghz);
+#else
+    HAL_SUBGHZ_RxCpltCallback(hsubghz);
 #endif /* USE_HAL_SUBGHZ_REGISTER_CALLBACKS */
   }
 
