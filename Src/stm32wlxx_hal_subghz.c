@@ -798,7 +798,7 @@ HAL_StatusTypeDef HAL_SUBGHZ_UnRegisterCadStatusCallback(SUBGHZ_HandleTypeDef *h
   */
 HAL_StatusTypeDef HAL_SUBGHZ_WriteRegisters(SUBGHZ_HandleTypeDef *hsubghz,
                                             uint16_t Address,
-                                            uint8_t *pBuffer,
+                                            const uint8_t *pBuffer,
                                             uint16_t Size)
 {
   HAL_StatusTypeDef status;
@@ -957,7 +957,7 @@ HAL_StatusTypeDef HAL_SUBGHZ_ReadRegister(SUBGHZ_HandleTypeDef *hsubghz,
   */
 HAL_StatusTypeDef HAL_SUBGHZ_ExecSetCmd(SUBGHZ_HandleTypeDef *hsubghz,
                                         SUBGHZ_RadioSetCmd_t Command,
-                                        uint8_t *pBuffer,
+                                        const uint8_t *pBuffer,
                                         uint16_t Size)
 {
   HAL_StatusTypeDef status;
@@ -1102,7 +1102,7 @@ HAL_StatusTypeDef HAL_SUBGHZ_ExecGetCmd(SUBGHZ_HandleTypeDef *hsubghz,
   */
 HAL_StatusTypeDef HAL_SUBGHZ_WriteBuffer(SUBGHZ_HandleTypeDef *hsubghz,
                                          uint8_t Offset,
-                                         uint8_t *pBuffer,
+                                         const uint8_t *pBuffer,
                                          uint16_t Size)
 {
   HAL_StatusTypeDef status;
