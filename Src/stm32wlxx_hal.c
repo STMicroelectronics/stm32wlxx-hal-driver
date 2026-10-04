@@ -70,6 +70,8 @@
 #define RADIO_SWITCH_CTRL_GPIO_PORT                    GPIOC
 #define RADIO_SWITCH_CTRL_GPIO_CLK_ENABLE()            __HAL_RCC_GPIOC_CLK_ENABLE()
 #define RADIO_SWITCH_CTRL_GPIO_CLK_DISABLE()           __HAL_RCC_GPIOC_CLK_DISABLE()
+#define RADIO_SWITCH_CTRL_IS_GPIO_CLK_ENABLED()        __HAL_RCC_GPIOC_IS_CLK_ENABLED()
+
 
 #define RADIO_SWITCH_CTRL3_PIN                         GPIO_PIN_3
 #define RADIO_SWITCH_CTRL1_PIN                         GPIO_PIN_4
@@ -884,15 +886,23 @@ HAL_StatusTypeDef HAL_RADIO_Init(void)
   */
 HAL_StatusTypeDef HAL_RADIO_DeInit(void)
 {
-  /* Enable the Radio Switch Clock */
-  RADIO_SWITCH_CTRL_GPIO_CLK_ENABLE();
+  uint32_t gpio_clk_was_enabled = RADIO_SWITCH_CTRL_IS_GPIO_CLK_ENABLED();
+
+  /* Enable the Radio Switch Clock, if not already enabled */
+  if (!gpio_clk_was_enabled)
+  {
+    RADIO_SWITCH_CTRL_GPIO_CLK_ENABLE();
+  }
 
   /* Turn off switch */
   HAL_GPIO_WritePin(RADIO_SWITCH_CTRL_GPIO_PORT,
                     (RADIO_SWITCH_CTRL1_PIN | RADIO_SWITCH_CTRL2_PIN | RADIO_SWITCH_CTRL3_PIN), GPIO_PIN_RESET);
 
-  /* Disable the Radio Switch Clock */
-  RADIO_SWITCH_CTRL_GPIO_CLK_DISABLE();
+  /* Disable the Radio Switch Clock again, if it was off before */
+  if (!gpio_clk_was_enabled)
+  {
+    RADIO_SWITCH_CTRL_GPIO_CLK_DISABLE();
+  }
 
   return HAL_OK;
 }
