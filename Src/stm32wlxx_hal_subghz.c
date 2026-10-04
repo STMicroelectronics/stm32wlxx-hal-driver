@@ -173,6 +173,8 @@ static HAL_StatusTypeDef SUBGHZSPI_Transmit(SUBGHZ_HandleTypeDef *hsubghz, uint8
 static HAL_StatusTypeDef SUBGHZSPI_Receive(SUBGHZ_HandleTypeDef *hsubghz, uint8_t *pData);
 static HAL_StatusTypeDef SUBGHZ_WaitOnBusy(SUBGHZ_HandleTypeDef *hsubghz);
 static HAL_StatusTypeDef SUBGHZ_CheckDeviceReady(SUBGHZ_HandleTypeDef *hsubghz);
+static uint32_t          SUBGHZ_DisableRadioIRQ(void);
+static void              SUBGHZ_RestoreRadioIRQ(uint32_t RadioIRQState);
 /**
   * @}
   */
@@ -802,9 +804,13 @@ HAL_StatusTypeDef HAL_SUBGHZ_WriteRegisters(SUBGHZ_HandleTypeDef *hsubghz,
                                             uint16_t Size)
 {
   HAL_StatusTypeDef status;
+  uint32_t radio_irq_state;
 
   if (hsubghz->State == HAL_SUBGHZ_STATE_READY)
   {
+    /* Mask the Radio interrupt to avoid reentrancy while the peripheral is locked */
+    radio_irq_state = SUBGHZ_DisableRadioIRQ();
+
     /* Process Locked */
     __HAL_LOCK(hsubghz);
 
@@ -843,6 +849,9 @@ HAL_StatusTypeDef HAL_SUBGHZ_WriteRegisters(SUBGHZ_HandleTypeDef *hsubghz,
     /* Process Unlocked */
     __HAL_UNLOCK(hsubghz);
 
+    /* Restore the Radio interrupt to its previous state */
+    SUBGHZ_RestoreRadioIRQ(radio_irq_state);
+
     return status;
   }
   else
@@ -867,9 +876,13 @@ HAL_StatusTypeDef HAL_SUBGHZ_ReadRegisters(SUBGHZ_HandleTypeDef *hsubghz,
 {
   HAL_StatusTypeDef status;
   uint8_t *pData = pBuffer;
+  uint32_t radio_irq_state;
 
   if (hsubghz->State == HAL_SUBGHZ_STATE_READY)
   {
+    /* Mask the Radio interrupt to avoid reentrancy while the peripheral is locked */
+    radio_irq_state = SUBGHZ_DisableRadioIRQ();
+
     /* Process Locked */
     __HAL_LOCK(hsubghz);
 
@@ -907,6 +920,9 @@ HAL_StatusTypeDef HAL_SUBGHZ_ReadRegisters(SUBGHZ_HandleTypeDef *hsubghz,
 
     /* Process Unlocked */
     __HAL_UNLOCK(hsubghz);
+
+    /* Restore the Radio interrupt to its previous state */
+    SUBGHZ_RestoreRadioIRQ(radio_irq_state);
 
     return status;
   }
@@ -961,12 +977,16 @@ HAL_StatusTypeDef HAL_SUBGHZ_ExecSetCmd(SUBGHZ_HandleTypeDef *hsubghz,
                                         uint16_t Size)
 {
   HAL_StatusTypeDef status;
+  uint32_t radio_irq_state;
 
   /* LORA Modulation not available on STM32WLx4xx devices */
   assert_param(IS_SUBGHZ_MODULATION_SUPPORTED(Command, pBuffer[0U]));
 
   if (hsubghz->State == HAL_SUBGHZ_STATE_READY)
   {
+    /* Mask the Radio interrupt to avoid reentrancy while the peripheral is locked */
+    radio_irq_state = SUBGHZ_DisableRadioIRQ();
+
     /* Process Locked */
     __HAL_LOCK(hsubghz);
 
@@ -1016,6 +1036,9 @@ HAL_StatusTypeDef HAL_SUBGHZ_ExecSetCmd(SUBGHZ_HandleTypeDef *hsubghz,
     /* Process Unlocked */
     __HAL_UNLOCK(hsubghz);
 
+    /* Restore the Radio interrupt to its previous state */
+    SUBGHZ_RestoreRadioIRQ(radio_irq_state);
+
     return status;
   }
   else
@@ -1040,9 +1063,13 @@ HAL_StatusTypeDef HAL_SUBGHZ_ExecGetCmd(SUBGHZ_HandleTypeDef *hsubghz,
 {
   HAL_StatusTypeDef status;
   uint8_t *pData = pBuffer;
+  uint32_t radio_irq_state;
 
   if (hsubghz->State == HAL_SUBGHZ_STATE_READY)
   {
+    /* Mask the Radio interrupt to avoid reentrancy while the peripheral is locked */
+    radio_irq_state = SUBGHZ_DisableRadioIRQ();
+
     /* Process Locked */
     __HAL_LOCK(hsubghz);
 
@@ -1083,6 +1110,9 @@ HAL_StatusTypeDef HAL_SUBGHZ_ExecGetCmd(SUBGHZ_HandleTypeDef *hsubghz,
     /* Process Unlocked */
     __HAL_UNLOCK(hsubghz);
 
+    /* Restore the Radio interrupt to its previous state */
+    SUBGHZ_RestoreRadioIRQ(radio_irq_state);
+
     return status;
   }
   else
@@ -1106,9 +1136,13 @@ HAL_StatusTypeDef HAL_SUBGHZ_WriteBuffer(SUBGHZ_HandleTypeDef *hsubghz,
                                          uint16_t Size)
 {
   HAL_StatusTypeDef status;
+  uint32_t radio_irq_state;
 
   if (hsubghz->State == HAL_SUBGHZ_STATE_READY)
   {
+    /* Mask the Radio interrupt to avoid reentrancy while the peripheral is locked */
+    radio_irq_state = SUBGHZ_DisableRadioIRQ();
+
     /* Process Locked */
     __HAL_LOCK(hsubghz);
 
@@ -1143,6 +1177,9 @@ HAL_StatusTypeDef HAL_SUBGHZ_WriteBuffer(SUBGHZ_HandleTypeDef *hsubghz,
     /* Process Unlocked */
     __HAL_UNLOCK(hsubghz);
 
+    /* Restore the Radio interrupt to its previous state */
+    SUBGHZ_RestoreRadioIRQ(radio_irq_state);
+
     return status;
   }
   else
@@ -1167,9 +1204,13 @@ HAL_StatusTypeDef HAL_SUBGHZ_ReadBuffer(SUBGHZ_HandleTypeDef *hsubghz,
 {
   HAL_StatusTypeDef status;
   uint8_t *pData = pBuffer;
+  uint32_t radio_irq_state;
 
   if (hsubghz->State == HAL_SUBGHZ_STATE_READY)
   {
+    /* Mask the Radio interrupt to avoid reentrancy while the peripheral is locked */
+    radio_irq_state = SUBGHZ_DisableRadioIRQ();
+
     /* Process Locked */
     __HAL_LOCK(hsubghz);
 
@@ -1206,6 +1247,9 @@ HAL_StatusTypeDef HAL_SUBGHZ_ReadBuffer(SUBGHZ_HandleTypeDef *hsubghz,
 
     /* Process Unlocked */
     __HAL_UNLOCK(hsubghz);
+
+    /* Restore the Radio interrupt to its previous state */
+    SUBGHZ_RestoreRadioIRQ(radio_irq_state);
 
     return status;
   }
@@ -1830,6 +1874,45 @@ static HAL_StatusTypeDef SUBGHZ_WaitOnBusy(SUBGHZ_HandleTypeDef *hsubghz)
   }
 
   return status;
+}
+
+/**
+  * @brief  Disable the Radio interrupt (SUBGHZ_Radio_IRQn) in the NVIC.
+  * @note   The HAL_SUBGHZ IO operations hold the peripheral lock while accessing
+  *         the Radio over SUBGHZSPI. If a Radio interrupt is raised during such
+  *         an access, HAL_SUBGHZ_IRQHandler cannot process it (the handle is
+  *         locked) nor clear the interrupt pending bit (that requires SPI
+  *         access), so the interrupt would keep firing endlessly. Masking the
+  *         Radio interrupt line for the duration of the access avoids this
+  *         reentrancy issue. Must be called before __HAL_LOCK() and paired with
+  *         SUBGHZ_RestoreRadioIRQ() before returning.
+  * @retval Previous enable state of SUBGHZ_Radio_IRQn (0: was disabled,
+  *         1: was enabled and has now been disabled).
+  */
+static uint32_t SUBGHZ_DisableRadioIRQ(void)
+{
+  uint32_t radio_irq_state = NVIC_GetEnableIRQ(SUBGHZ_Radio_IRQn);
+
+  if (radio_irq_state != 0U)
+  {
+    NVIC_DisableIRQ(SUBGHZ_Radio_IRQn);
+  }
+
+  return radio_irq_state;
+}
+
+/**
+  * @brief  Re-enable the Radio interrupt (SUBGHZ_Radio_IRQn) in the NVIC if it
+  *         was enabled before the matching SUBGHZ_DisableRadioIRQ() call.
+  * @param  RadioIRQState value returned by SUBGHZ_DisableRadioIRQ().
+  * @retval None
+  */
+static void SUBGHZ_RestoreRadioIRQ(uint32_t RadioIRQState)
+{
+  if (RadioIRQState != 0U)
+  {
+    NVIC_EnableIRQ(SUBGHZ_Radio_IRQn);
+  }
 }
 /**
   * @}
