@@ -32,7 +32,6 @@ extern "C" {
   */
 
 
-
 /** @defgroup CRYPEx CRYPEx
   * @brief CRYP Extension HAL module driver.
   * @{

@@ -31,7 +31,6 @@
   */
 
 
-
 #ifdef HAL_CRYP_MODULE_ENABLED
 
 /* Private typedef -----------------------------------------------------------*/

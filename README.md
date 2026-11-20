@@ -1,39 +1,17 @@
-# STM32CubeWL HAL Driver MCU Component
+# STM32WL HAL Driver MCU Software Component
 
-![tag](https://img.shields.io/badge/tag-v1.6.0-brightgreen.svg)
+![tag](https://img.shields.io/badge/tag-v1.7.0-brightgreen.svg)
+[![release note](https://img.shields.io/badge/release_note-view_html-gold.svg)](https://htmlpreview.github.io/?https://github.com/STMicroelectronics/stm32wlxx-hal-driver/blob/main/Release_Notes.html)
+[![offer](https://img.shields.io/badge/stm32cube_mcu_offer-browse-orange.svg)](https://github.com/STMicroelectronics/STM32Cube_MCU_Overall_Offer)
 
 ## Overview
 
-**STM32Cube** is an STMicroelectronics original initiative to ease developers' life by reducing efforts, time and cost.
-
-**STM32Cube** covers the overall STM32 products portfolio. It includes a comprehensive embedded software platform delivered for each STM32 series.
-   * The CMSIS modules (core and device) corresponding to the ARM(tm) core implemented in this STM32 product.
-   * The STM32 HAL-LL drivers, an abstraction layer offering a set of APIs ensuring maximized portability across the STM32 portfolio.
-   * The BSP drivers of each evaluation, demonstration or nucleo board provided for this STM32 series.
-   * A consistent set of middleware libraries such as RTOS, USB, FatFS, graphics, touch sensing library...
-   * A full set of software projects (basic examples, applications, and demonstrations) for each board provided for this STM32 series.
-
-Two models of publication are proposed for the STM32Cube embedded software:
-   * The monolithic **MCU Package**: all STM32Cube software modules of one STM32 series are present (Drivers, Middleware, Projects, Utilities) in the repository (usual name **STM32Cubexx**, xx corresponding to the STM32 series).
-   * The **MCU component**: each STM32Cube software module being part of the STM32Cube MCU Package, is delivered as an individual repository, allowing the user to select and get only the required software functions.
-
-## Description
-
-This **stm32wlxx_hal_driver** MCU component repo is one element of the STM32CubeWL MCU embedded software package, providing the **HAL-LL Drivers** part.
-
-## Release note
-
-Details about the content of this release are available in the release note [here](https://htmlpreview.github.io/?https://github.com/STMicroelectronics/stm32wlxx_hal_driver/blob/main/Release_Notes.html).
-
+This repository provides the STM32Cube **HAL-LL Drivers** of the **STM32CubeWL** MCU firmware.
 
 ## Compatibility information
 
-It is **crucial** that you use a consistent set of versions for the CMSIS Core - CMSIS Device - HAL, as mentioned in [this](https://htmlpreview.github.io/?https://github.com/STMicroelectronics/STM32CubeWL/blob/main/Release_Notes.html) release note.
+Please refer to the **release note** in the firmware repository for the STM32 series you are using (see the list in the _STM32Cube MCU Offer_). It is **important** to use a **consistent set** of software versions as specified.
 
-The full **STM32CubeWL** MCU package is available [here](https://github.com/STMicroelectronics/STM32CubeWL).
+## Feedback and contributions
 
-## Troubleshooting
-
-If you have any issue with the **Software content** of this repository, you can file an issue [here](https://github.com/STMicroelectronics/stm32wlxx_hal_driver/issues/new/choose).
-
-For any other question related to the product, the tools, the environment, you can submit a topic on the [ST Community/STM32 MCUs forum](https://community.st.com/s/group/0F90X000000AXsASAW/stm32-mcus).
+We value and appreciate feedback and contributions from the community. Please refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file for details on how to participate effectively.
