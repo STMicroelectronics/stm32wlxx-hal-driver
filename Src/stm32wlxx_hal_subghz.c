@@ -801,7 +801,7 @@ HAL_StatusTypeDef HAL_SUBGHZ_WriteRegisters(SUBGHZ_HandleTypeDef *hsubghz,
                                             uint8_t *pBuffer,
                                             uint16_t Size)
 {
-  HAL_StatusTypeDef status;
+  HAL_StatusTypeDef status = HAL_OK;
 
   if (hsubghz->State == HAL_SUBGHZ_STATE_READY)
   {
@@ -810,32 +810,46 @@ HAL_StatusTypeDef HAL_SUBGHZ_WriteRegisters(SUBGHZ_HandleTypeDef *hsubghz,
 
     hsubghz->State = HAL_SUBGHZ_STATE_BUSY;
 
-    (void)SUBGHZ_CheckDeviceReady(hsubghz);
-
-    /* NSS = 0 */
-    LL_PWR_SelectSUBGHZSPI_NSS();
-
-    (void)SUBGHZSPI_Transmit(hsubghz, SUBGHZ_RADIO_WRITE_REGISTER);
-    (void)SUBGHZSPI_Transmit(hsubghz, (uint8_t)((Address & 0xFF00U) >> 8U));
-    (void)SUBGHZSPI_Transmit(hsubghz, (uint8_t)(Address & 0x00FFU));
-
-    for (uint16_t i = 0U; i < Size; i++)
+    if (SUBGHZ_CheckDeviceReady(hsubghz) == HAL_OK)
     {
-      (void)SUBGHZSPI_Transmit(hsubghz, pBuffer[i]);
-    }
 
-    /* NSS = 1 */
-    LL_PWR_UnselectSUBGHZSPI_NSS();
+      /* NSS = 0 */
+      LL_PWR_SelectSUBGHZSPI_NSS();
 
-    (void)SUBGHZ_WaitOnBusy(hsubghz);
+      if (SUBGHZSPI_Transmit(hsubghz, SUBGHZ_RADIO_WRITE_REGISTER) == HAL_OK
+       && SUBGHZSPI_Transmit(hsubghz, (uint8_t)((Address & 0xFF00U) >> 8U)) == HAL_OK
+       && SUBGHZSPI_Transmit(hsubghz, (uint8_t)(Address & 0x00FFU)) == HAL_OK)
+       {
 
-    if (hsubghz->ErrorCode != HAL_SUBGHZ_ERROR_NONE)
-    {
-      status = HAL_ERROR;
+
+        for (uint16_t i = 0U; i < Size; i++)
+        {
+          if (SUBGHZSPI_Transmit(hsubghz, pBuffer[i]) != HAL_OK)
+          {
+            status = HAL_ERROR;
+            break;
+          }
+        }
+      }
+      else
+      {
+        status = HAL_ERROR;
+      }
+
+      /* NSS = 1 */
+      LL_PWR_UnselectSUBGHZSPI_NSS();
+
+      if (status == HAL_OK)
+      {
+        if (SUBGHZ_WaitOnBusy(hsubghz) != HAL_OK || hsubghz->ErrorCode != HAL_SUBGHZ_ERROR_NONE)
+        {
+          status = HAL_ERROR;
+        }
+      }
     }
     else
     {
-      status = HAL_OK;
+      status = HAL_ERROR;
     }
 
     hsubghz->State = HAL_SUBGHZ_STATE_READY;
@@ -865,7 +879,7 @@ HAL_StatusTypeDef HAL_SUBGHZ_ReadRegisters(SUBGHZ_HandleTypeDef *hsubghz,
                                            uint8_t *pBuffer,
                                            uint16_t Size)
 {
-  HAL_StatusTypeDef status;
+  HAL_StatusTypeDef status = HAL_OK;
   uint8_t *pData = pBuffer;
 
   if (hsubghz->State == HAL_SUBGHZ_STATE_READY)
@@ -873,34 +887,45 @@ HAL_StatusTypeDef HAL_SUBGHZ_ReadRegisters(SUBGHZ_HandleTypeDef *hsubghz,
     /* Process Locked */
     __HAL_LOCK(hsubghz);
 
-    (void)SUBGHZ_CheckDeviceReady(hsubghz);
-
-    /* NSS = 0 */
-    LL_PWR_SelectSUBGHZSPI_NSS();
-
-    (void)SUBGHZSPI_Transmit(hsubghz, SUBGHZ_RADIO_READ_REGISTER);
-    (void)SUBGHZSPI_Transmit(hsubghz, (uint8_t)((Address & 0xFF00U) >> 8U));
-    (void)SUBGHZSPI_Transmit(hsubghz, (uint8_t)(Address & 0x00FFU));
-    (void)SUBGHZSPI_Transmit(hsubghz, 0U);
-
-    for (uint16_t i = 0U; i < Size; i++)
+    if (SUBGHZ_CheckDeviceReady(hsubghz) == HAL_OK)
     {
-      (void)SUBGHZSPI_Receive(hsubghz, (pData));
-      pData++;
-    }
+      /* NSS = 0 */
+      LL_PWR_SelectSUBGHZSPI_NSS();
 
-    /* NSS = 1 */
-    LL_PWR_UnselectSUBGHZSPI_NSS();
+      if (SUBGHZSPI_Transmit(hsubghz, SUBGHZ_RADIO_READ_REGISTER) == HAL_OK
+       && SUBGHZSPI_Transmit(hsubghz, (uint8_t)((Address & 0xFF00U) >> 8U)) == HAL_OK
+       && SUBGHZSPI_Transmit(hsubghz, (uint8_t)(Address & 0x00FFU)) == HAL_OK
+       && SUBGHZSPI_Transmit(hsubghz, 0U) == HAL_OK)
+      {
+        for (uint16_t i = 0U; i < Size; i++)
+        {
+          if (SUBGHZSPI_Receive(hsubghz, (pData)) != HAL_OK)
+          {
+            status = HAL_ERROR;
+            break;
+          }
+          pData++;
+        }
+      }
+      else
+      {
+        status = HAL_ERROR;
+      }
 
-    (void)SUBGHZ_WaitOnBusy(hsubghz);
+      /* NSS = 1 */
+      LL_PWR_UnselectSUBGHZSPI_NSS();
 
-    if (hsubghz->ErrorCode != HAL_SUBGHZ_ERROR_NONE)
-    {
-      status = HAL_ERROR;
+      if (status == HAL_OK)
+      {
+        if (SUBGHZ_WaitOnBusy(hsubghz) != HAL_OK || hsubghz->ErrorCode != HAL_SUBGHZ_ERROR_NONE)
+        {
+          status = HAL_ERROR;
+        }
+      }
     }
     else
     {
-      status = HAL_OK;
+      status = HAL_ERROR;
     }
 
     hsubghz->State = HAL_SUBGHZ_STATE_READY;
@@ -960,7 +985,7 @@ HAL_StatusTypeDef HAL_SUBGHZ_ExecSetCmd(SUBGHZ_HandleTypeDef *hsubghz,
                                         uint8_t *pBuffer,
                                         uint16_t Size)
 {
-  HAL_StatusTypeDef status;
+  HAL_StatusTypeDef status = HAL_OK;
 
   /* LORA Modulation not available on STM32WLx4xx devices */
   assert_param(IS_SUBGHZ_MODULATION_SUPPORTED(Command, pBuffer[0U]));
@@ -973,42 +998,58 @@ HAL_StatusTypeDef HAL_SUBGHZ_ExecSetCmd(SUBGHZ_HandleTypeDef *hsubghz,
     hsubghz->State = HAL_SUBGHZ_STATE_BUSY;
 
     /* Need to wakeup Radio if already in Sleep at startup */
-    (void)SUBGHZ_CheckDeviceReady(hsubghz);
-
-    if ((Command == RADIO_SET_SLEEP) || (Command == RADIO_SET_RXDUTYCYCLE))
+    if (SUBGHZ_CheckDeviceReady(hsubghz) == HAL_OK)
     {
-      hsubghz->DeepSleep = SUBGHZ_DEEP_SLEEP_ENABLE;
+      if ((Command == RADIO_SET_SLEEP) || (Command == RADIO_SET_RXDUTYCYCLE))
+      {
+        hsubghz->DeepSleep = SUBGHZ_DEEP_SLEEP_ENABLE;
+      }
+      else
+      {
+        hsubghz->DeepSleep = SUBGHZ_DEEP_SLEEP_DISABLE;
+      }
+
+      /* NSS = 0 */
+      LL_PWR_SelectSUBGHZSPI_NSS();
+
+      if (SUBGHZSPI_Transmit(hsubghz, (uint8_t)Command) == HAL_OK)
+      {
+        for (uint16_t i = 0U; i < Size; i++)
+        {
+          if (SUBGHZSPI_Transmit(hsubghz, pBuffer[i]) != HAL_OK)
+          {
+            status = HAL_ERROR;
+            break;
+          }
+        }
+      }
+      else
+      {
+        status = HAL_ERROR;
+      }
+
+      /* NSS = 1 */
+      LL_PWR_UnselectSUBGHZSPI_NSS();
+
+      if (status == HAL_OK)
+      {
+        if (Command != RADIO_SET_SLEEP)
+        {
+          if (SUBGHZ_WaitOnBusy(hsubghz) != HAL_OK)
+          {
+            status = HAL_ERROR;
+          }
+        }
+
+        if (hsubghz->ErrorCode != HAL_SUBGHZ_ERROR_NONE)
+        {
+          status = HAL_ERROR;
+        }
+      }
     }
     else
-    {
-      hsubghz->DeepSleep = SUBGHZ_DEEP_SLEEP_DISABLE;
-    }
-
-    /* NSS = 0 */
-    LL_PWR_SelectSUBGHZSPI_NSS();
-
-    (void)SUBGHZSPI_Transmit(hsubghz, (uint8_t)Command);
-
-    for (uint16_t i = 0U; i < Size; i++)
-    {
-      (void)SUBGHZSPI_Transmit(hsubghz, pBuffer[i]);
-    }
-
-    /* NSS = 1 */
-    LL_PWR_UnselectSUBGHZSPI_NSS();
-
-    if (Command != RADIO_SET_SLEEP)
-    {
-      (void)SUBGHZ_WaitOnBusy(hsubghz);
-    }
-
-    if (hsubghz->ErrorCode != HAL_SUBGHZ_ERROR_NONE)
     {
       status = HAL_ERROR;
-    }
-    else
-    {
-      status = HAL_OK;
     }
 
     hsubghz->State = HAL_SUBGHZ_STATE_READY;
@@ -1038,7 +1079,7 @@ HAL_StatusTypeDef HAL_SUBGHZ_ExecGetCmd(SUBGHZ_HandleTypeDef *hsubghz,
                                         uint8_t *pBuffer,
                                         uint16_t Size)
 {
-  HAL_StatusTypeDef status;
+  HAL_StatusTypeDef status = HAL_OK;
   uint8_t *pData = pBuffer;
 
   if (hsubghz->State == HAL_SUBGHZ_STATE_READY)
@@ -1048,34 +1089,44 @@ HAL_StatusTypeDef HAL_SUBGHZ_ExecGetCmd(SUBGHZ_HandleTypeDef *hsubghz,
 
     hsubghz->State = HAL_SUBGHZ_STATE_BUSY;
 
-    (void)SUBGHZ_CheckDeviceReady(hsubghz);
-
-    /* NSS = 0 */
-    LL_PWR_SelectSUBGHZSPI_NSS();
-
-    (void)SUBGHZSPI_Transmit(hsubghz, (uint8_t)Command);
-
-    /* Use to flush the Status (First byte) receive from SUBGHZ as not use */
-    (void)SUBGHZSPI_Transmit(hsubghz, 0x00U);
-
-    for (uint16_t i = 0U; i < Size; i++)
+    if (SUBGHZ_CheckDeviceReady(hsubghz) == HAL_OK)
     {
-      (void)SUBGHZSPI_Receive(hsubghz, (pData));
-      pData++;
-    }
+      /* NSS = 0 */
+      LL_PWR_SelectSUBGHZSPI_NSS();
 
-    /* NSS = 1 */
-    LL_PWR_UnselectSUBGHZSPI_NSS();
+      if (SUBGHZSPI_Transmit(hsubghz, (uint8_t)Command) == HAL_OK
+          /* Use to flush the Status (First byte) receive from SUBGHZ as not use */
+       && SUBGHZSPI_Transmit(hsubghz, 0x00U) == HAL_OK)
+      {
+        for (uint16_t i = 0U; i < Size; i++)
+        {
+          if (SUBGHZSPI_Receive(hsubghz, (pData)) != HAL_OK)
+          {
+            status = HAL_ERROR;
+            break;
+          }
+          pData++;
+        }
+      }
+      else
+      {
+        status = HAL_ERROR;
+      }
 
-    (void)SUBGHZ_WaitOnBusy(hsubghz);
+      /* NSS = 1 */
+      LL_PWR_UnselectSUBGHZSPI_NSS();
 
-    if (hsubghz->ErrorCode != HAL_SUBGHZ_ERROR_NONE)
-    {
-      status = HAL_ERROR;
+      if (status == HAL_OK)
+      {
+        if (SUBGHZ_WaitOnBusy(hsubghz) != HAL_OK || hsubghz->ErrorCode != HAL_SUBGHZ_ERROR_NONE)
+        {
+          status = HAL_ERROR;
+        }
+      }
     }
     else
     {
-      status = HAL_OK;
+      status = HAL_ERROR;
     }
 
     hsubghz->State = HAL_SUBGHZ_STATE_READY;
@@ -1105,37 +1156,49 @@ HAL_StatusTypeDef HAL_SUBGHZ_WriteBuffer(SUBGHZ_HandleTypeDef *hsubghz,
                                          uint8_t *pBuffer,
                                          uint16_t Size)
 {
-  HAL_StatusTypeDef status;
+  HAL_StatusTypeDef status = HAL_OK;
 
   if (hsubghz->State == HAL_SUBGHZ_STATE_READY)
   {
     /* Process Locked */
     __HAL_LOCK(hsubghz);
 
-    (void)SUBGHZ_CheckDeviceReady(hsubghz);
-
-    /* NSS = 0 */
-    LL_PWR_SelectSUBGHZSPI_NSS();
-
-    (void)SUBGHZSPI_Transmit(hsubghz, SUBGHZ_RADIO_WRITE_BUFFER);
-    (void)SUBGHZSPI_Transmit(hsubghz, Offset);
-
-    for (uint16_t i = 0U; i < Size; i++)
+    if (SUBGHZ_CheckDeviceReady(hsubghz) == HAL_OK)
     {
-      (void)SUBGHZSPI_Transmit(hsubghz, pBuffer[i]);
-    }
-    /* NSS = 1 */
-    LL_PWR_UnselectSUBGHZSPI_NSS();
+      /* NSS = 0 */
+      LL_PWR_SelectSUBGHZSPI_NSS();
 
-    (void)SUBGHZ_WaitOnBusy(hsubghz);
+      if (SUBGHZSPI_Transmit(hsubghz, SUBGHZ_RADIO_WRITE_BUFFER) == HAL_OK
+       && SUBGHZSPI_Transmit(hsubghz, Offset) == HAL_OK)
+      {
+        for (uint16_t i = 0U; i < Size; i++)
+        {
+          if (SUBGHZSPI_Transmit(hsubghz, pBuffer[i]) != HAL_OK)
+          {
+            status = HAL_ERROR;
+            break;
+          }
+        }
+      }
+      else
+      {
+        status = HAL_ERROR;
+      }
 
-    if (hsubghz->ErrorCode != HAL_SUBGHZ_ERROR_NONE)
-    {
-      status = HAL_ERROR;
+      /* NSS = 1 */
+      LL_PWR_UnselectSUBGHZSPI_NSS();
+
+      if (status == HAL_OK)
+      {
+        if (SUBGHZ_WaitOnBusy(hsubghz) != HAL_OK || hsubghz->ErrorCode != HAL_SUBGHZ_ERROR_NONE)
+        {
+          status = HAL_ERROR;
+        }
+      }
     }
     else
     {
-      status = HAL_OK;
+      status = HAL_ERROR;
     }
 
     hsubghz->State = HAL_SUBGHZ_STATE_READY;
@@ -1165,7 +1228,7 @@ HAL_StatusTypeDef HAL_SUBGHZ_ReadBuffer(SUBGHZ_HandleTypeDef *hsubghz,
                                         uint8_t *pBuffer,
                                         uint16_t Size)
 {
-  HAL_StatusTypeDef status;
+  HAL_StatusTypeDef status = HAL_OK;
   uint8_t *pData = pBuffer;
 
   if (hsubghz->State == HAL_SUBGHZ_STATE_READY)
@@ -1173,33 +1236,44 @@ HAL_StatusTypeDef HAL_SUBGHZ_ReadBuffer(SUBGHZ_HandleTypeDef *hsubghz,
     /* Process Locked */
     __HAL_LOCK(hsubghz);
 
-    (void)SUBGHZ_CheckDeviceReady(hsubghz);
-
-    /* NSS = 0 */
-    LL_PWR_SelectSUBGHZSPI_NSS();
-
-    (void)SUBGHZSPI_Transmit(hsubghz, SUBGHZ_RADIO_READ_BUFFER);
-    (void)SUBGHZSPI_Transmit(hsubghz, Offset);
-    (void)SUBGHZSPI_Transmit(hsubghz, 0x00U);
-
-    for (uint16_t i = 0U; i < Size; i++)
+    if (SUBGHZ_CheckDeviceReady(hsubghz) == HAL_OK)
     {
-      (void)SUBGHZSPI_Receive(hsubghz, (pData));
-      pData++;
-    }
+      /* NSS = 0 */
+      LL_PWR_SelectSUBGHZSPI_NSS();
 
-    /* NSS = 1 */
-    LL_PWR_UnselectSUBGHZSPI_NSS();
+      if (SUBGHZSPI_Transmit(hsubghz, SUBGHZ_RADIO_READ_BUFFER) == HAL_OK
+       && SUBGHZSPI_Transmit(hsubghz, Offset) == HAL_OK
+       && SUBGHZSPI_Transmit(hsubghz, 0x00U) == HAL_OK)
+      {
+        for (uint16_t i = 0U; i < Size; i++)
+        {
+          if (SUBGHZSPI_Receive(hsubghz, (pData)) != HAL_OK)
+          {
+            status = HAL_ERROR;
+            break;
+          }
+          pData++;
+        }
+      }
+      else
+      {
+        status = HAL_ERROR;
+      }
 
-    (void)SUBGHZ_WaitOnBusy(hsubghz);
+      /* NSS = 1 */
+      LL_PWR_UnselectSUBGHZSPI_NSS();
 
-    if (hsubghz->ErrorCode != HAL_SUBGHZ_ERROR_NONE)
-    {
-      status = HAL_ERROR;
+      if (status == HAL_OK)
+      {
+        if (SUBGHZ_WaitOnBusy(hsubghz) != HAL_OK || hsubghz->ErrorCode != HAL_SUBGHZ_ERROR_NONE)
+        {
+          status = HAL_ERROR;
+        }
+      }
     }
     else
     {
-      status = HAL_OK;
+      status = HAL_ERROR;
     }
 
     hsubghz->State = HAL_SUBGHZ_STATE_READY;
