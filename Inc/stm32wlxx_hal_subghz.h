@@ -99,7 +99,7 @@ typedef struct
   void (* SyncWordValidCallback)(struct __SUBGHZ_HandleTypeDef *hsubghz);         /*!< SUBGHZ Synchro word valid callback    */
   void (* HeaderValidCallback)(struct __SUBGHZ_HandleTypeDef *hsubghz);           /*!< SUBGHZ Header valid callback          */
   void (* HeaderErrorCallback)(struct __SUBGHZ_HandleTypeDef *hsubghz);           /*!< SUBGHZ Header error callback          */
-  void (* CRCErrorCallback)(struct __SUBGHZ_HandleTypeDef *hsubghz);              /*!< SUBGHZ CRC Error callback             */
+  void (* CRCErrorCallback)(struct __SUBGHZ_HandleTypeDef *hsubghz);              /*!< SUBGHZ Reception error callback       */
   void (* CADStatusCallback)(struct __SUBGHZ_HandleTypeDef *hsubghz, HAL_SUBGHZ_CadStatusTypeDef cadstatus); /*!< SUBGHZ CAD Status callback            */
   void (* RxTxTimeoutCallback)(struct __SUBGHZ_HandleTypeDef *hsubghz);           /*!< SUBGHZ Rx Tx Timeout callback         */
   void (* MspInitCallback)(struct __SUBGHZ_HandleTypeDef *hsubghz);               /*!< SUBGHZ Msp Init callback              */
@@ -201,7 +201,6 @@ typedef enum
 #define HAL_SUBGHZ_ERROR_NONE               (0x00000000U)   /*!< No error                         */
 #define HAL_SUBGHZ_ERROR_TIMEOUT            (0x00000001U)   /*!< Timeout Error                    */
 #define HAL_SUBGHZ_ERROR_RF_BUSY            (0x00000002U)   /*!< RF Busy Error                    */
-#define HAL_SUBGHZ_ERROR_CRC_MISMATCH       (0x00000004U)   /*!< CRC mismatch Error               */
 #if (USE_HAL_SUBGHZ_REGISTER_CALLBACKS == 1)
 #define HAL_SUBGHZ_ERROR_INVALID_CALLBACK   (0x00000080U)   /*!< Invalid Callback error           */
 #endif /* USE_HAL_SUBGHZ_REGISTER_CALLBACKS */
